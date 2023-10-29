@@ -3,9 +3,8 @@ from sqlite3 import Error
 from datetime import datetime
 from time import sleep
 
-acc_index = 100
-database = r"bank_management.db"
 
+database = r"bank_management.db"
 
 # creates Object_1 database if it doesn't exist, or creates Object_1 connection if the database exists
 def create_connection(db_file):
@@ -63,9 +62,12 @@ def afisare(conn):
     cur = conn.cursor()
     cur.execute("SELECT * FROM conturi")
     rows = cur.fetchall()
-    for row in rows:
-        print(f'Numar cont: {row[0]}\nNume: {row[1]}\nSold: {row[2]}')
-        print()
+    if len(rows) != 0:
+        for row in rows:
+            print(f'Numar cont: {row[0]}\nNume: {row[1]}\nSold: {row[2]}')
+            print()
+    else:
+        print('Nu exista conturi in baza de date.')
 
 
 def extras(conn):
@@ -195,7 +197,16 @@ def update_tip_cont(conn):
             loop = False
         except ValueError:
             print("Valoarea introdusa nu este valida!")
-    tipcont = input("Introduceti tipul contului: ")
+    tip_cont_loop = True
+    while tip_cont_loop is True:
+        try:
+            tipcont = input("Introduceti tipul contului (curent/economii): ")
+            if tipcont not in ['curent', 'economii']:
+                raise Exception
+            else:
+                tip_cont_loop = False
+        except Exception:
+            print('Tipul selectat nu este valid! Va rugam incercati din nou...')
     azi = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     sql = '''UPDATE conturi
                 SET tip_cont = ?,
